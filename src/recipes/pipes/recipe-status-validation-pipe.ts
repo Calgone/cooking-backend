@@ -1,5 +1,5 @@
 import { PipeTransform, ArgumentMetadata, BadRequestException } from '@nestjs/common';
-import { RecipeStatus } from '../recipe.model';
+import { RecipeStatus } from '../recipe-status-enum';
 
 export class RecipeStatusValidationPipe implements PipeTransform {
     readonly allowedStatuses = [

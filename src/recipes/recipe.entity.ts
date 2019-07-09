@@ -13,5 +13,5 @@ export class Recipe extends BaseEntity {
     description: string;
 
     @Column()
-    recipeStatus: RecipeStatus;
+    status: RecipeStatus;
 }

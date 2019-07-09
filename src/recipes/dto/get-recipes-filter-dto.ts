@@ -1,4 +1,4 @@
-import { RecipeStatus } from '../recipe.model';
+import { RecipeStatus } from '../recipe-status-enum';
 import { IsOptional, IsIn, IsNotEmpty } from 'class-validator';
 
 export class GetRecipesFilterDto {

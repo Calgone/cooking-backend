@@ -3,63 +3,47 @@ import { RecipeStatus } from './recipe-status-enum';
 // import * as uuid from 'uuid/v1';
 import { CreateRecipeDto } from './dto/create-recipe-dto';
 import { GetRecipesFilterDto } from './dto/get-recipes-filter-dto';
+import { RecipeRepository } from './recipe-repository';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Recipe } from './recipe.entity';
 
 @Injectable()
 export class RecipesService {
     // private recipes: Recipe[] = [];
+    constructor(
+        @InjectRepository(RecipeRepository)
+        private recipeRepository: RecipeRepository,
+    ) {
 
-    // getAllRecipes(): Recipe[] {
-    //     return this.recipes;
-    // }
+    }
 
-    // getRecipesWithFilters(filterDto: GetRecipesFilterDto): Recipe[] {
-    //     const { status, search } = filterDto;
-    //     let recipes = this.getAllRecipes();
+    async getRecipes(filterDto: GetRecipesFilterDto): Promise<Recipe[]> {
+        return this.recipeRepository.getRecipes(filterDto);
+    }
 
-    //     if (status) {
-    //         recipes = recipes.filter(recipe => recipe.status === status);
-    //     }
+    async getRecipeById(id: number): Promise<Recipe> {
+        const found = await this.recipeRepository.findOne(id);
+        if (!found) {
+            throw new NotFoundException(`Recipe with id "${id}" not found`);
+        }
+        return found;
+    }
 
-    //     if (search) {
-    //         recipes = recipes.filter(recipe =>
-    //             recipe.title.includes(search) ||
-    //             recipe.description.includes(search)
-    //         );
-    //     }
-    //     return recipes;
-    // }
+    async createRecipe(createRecipeDto: CreateRecipeDto): Promise<Recipe> {
+        return this.recipeRepository.createRecipe(createRecipeDto);
+    }
 
-    // getRecipeById(id: string): Recipe {
-    //     const found = this.recipes.find(recipe => recipe.id === id);
-    //     if (!found) {
-    //         throw new NotFoundException(`Recipe with id "${id}" not found`);
-    //     } else {
-    //         return found;
-    //     }
-    // }
+    async deleteRecipe(id: number): Promise<void> {
+        const result = await this.recipeRepository.delete(id);
+        if (result.affected === 0) {
+            throw new NotFoundException(`Recipe with id "${id}" not found`);
+        }
+    }
 
-    // createRecipe(createRecipeDto: CreateRecipeDto): Recipe {
-    //     const { title, description } = createRecipeDto;
-
-    //     const recipe: Recipe = {
-    //         id: uuid(),
-    //         title,
-    //         description,
-    //         status: RecipeStatus.OPEN,
-    //     };
-    //     this.recipes.push(recipe);
-    //     return recipe;
-    // }
-
-    // deleteRecipe(id: string): void {
-    //     const found = this.getRecipeById(id);
-
-    //     this.recipes = this.recipes.filter(recipe => recipe.id !== found.id);
-    // }
-
-    // updateRecipeStatus(id: string, status: RecipeStatus): Recipe {
-    //     const recipe = this.getRecipeById(id);
-    //     recipe.status = status;
-    //     return recipe;
-    // }
+    async updateRecipeStatus(id: number, status: RecipeStatus): Promise<Recipe> {
+        const recipe = await this.getRecipeById(id);
+        recipe.status = status;
+        await recipe.save();
+        return recipe;
+    }
 }
