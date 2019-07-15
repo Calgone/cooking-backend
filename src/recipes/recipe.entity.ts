@@ -1,5 +1,6 @@
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { RecipeStatus } from './recipe-status-enum';
+import { User } from '../auth/user.entity';
 
 @Entity()
 export class Recipe extends BaseEntity {
@@ -14,4 +15,11 @@ export class Recipe extends BaseEntity {
 
     @Column()
     status: RecipeStatus;
+
+    @ManyToOne(type => User, user => user.recipes, { eager: false })
+    user: User;
+
+    @Column()
+    userId: number;
+
 }
