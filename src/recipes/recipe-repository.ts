@@ -17,20 +17,43 @@ export class RecipeRepository extends Repository<Recipe> {
         const { status, search } = filterDto;
         const query = this.createQueryBuilder('recipe');
 
-        query.where('recipe.userId = :userId', {userId: user.id});
+        query.where('recipe.userId = :userId', { userId: user.id });
 
         if (status) {
             query.andWhere('recipe.status = :status', { status });
         }
 
         if (search) {
-            query.andWhere('recipe.title LIKE :search OR recipe.description LIKE :search', { search: `%${search}%` });
+            query.andWhere('recipe.title LIKE :search OR recipe.description LIKE :search',
+                { search: `%${search}%` });
         }
         try {
             const recipes = await query.getMany();
             return recipes;
         } catch (error) {
-            this.logger.error(`Failed to get recipe for user ${user.username}, Filters: ${JSON.stringify(filterDto)}`, error.stack);
+            this.logger.error(`Failed to get recipe for user ${user.username},
+                                Filters: ${JSON.stringify(filterDto)}`, error.stack);
+            throw new InternalServerErrorException();
+        }
+    }
+
+    async getAllRecipes(
+        filterDto: GetRecipesFilterDto,
+    ): Promise<Recipe[]> {
+        const { status, search } = filterDto;
+        const query = this.createQueryBuilder('recipe');
+        if (status) {
+            query.andWhere('recipe.status = :status', { status });
+        }
+
+        if (search) {
+            query.andWhere('recipe.title LIKE :search OR recipe.description LIKE :search',
+                { search: `%${search}%` });
+        }
+        try {
+            const recipes = await query.getMany();
+            return recipes;
+        } catch (error) {
             throw new InternalServerErrorException();
         }
     }
@@ -47,9 +70,11 @@ export class RecipeRepository extends Repository<Recipe> {
         recipe.user = user;
 
         try {
-        await recipe.save();
+            await recipe.save();
         } catch (error) {
-            this.logger.error(`Failed to create recipe for user ${user.username}, Data: ${createRecipeDto}`, error.stack);
+            this.logger.error(`Failed to create recipe for user ${user.username},
+                            Data: ${createRecipeDto}`,
+                error.stack);
             throw new InternalServerErrorException();
         }
 

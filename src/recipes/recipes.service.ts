@@ -25,6 +25,12 @@ export class RecipesService {
         return this.recipeRepository.getRecipes(filterDto, user);
     }
 
+    async getAllRecipes(
+        filterDto: GetRecipesFilterDto,
+    ): Promise<Recipe[]> {
+        return this.recipeRepository.getAllRecipes(filterDto);
+    }
+
     async getRecipeById(
         id: number, user: User): Promise<Recipe> {
         const found = await this.recipeRepository.findOne({ where: { id, userId: user.id } });

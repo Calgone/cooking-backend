@@ -10,19 +10,28 @@ import { User } from '../auth/user.entity';
 import { GetUser } from '../auth/get-user-decorator';
 
 @Controller('recipes')
-@UseGuards(AuthGuard())
+// @UseGuards(AuthGuard()) // Réactiver pour protéger toutes les routes
 export class RecipesController {
     private logger = new Logger('RecipesController');
 
     constructor(private recipesService: RecipesService) { }
 
     @Get()
-    getTasks(
+    getRecipes(
         @Query(ValidationPipe) filterDto: GetRecipesFilterDto,
         @GetUser() user: User,
     ): Promise<Recipe[]> {
-        this.logger.verbose(`User ${user.username} retrieving all recipes. Filters : ${JSON.stringify(filterDto)}`);
+        this.logger.verbose(`User ${user.username} retrieving all recipes.
+                            Filters : ${JSON.stringify(filterDto)}`);
         return this.recipesService.getRecipes(filterDto, user);
+    }
+
+    @Get('/all')
+    getAllRecipes(
+        @Query(ValidationPipe) filterDto: GetRecipesFilterDto,
+    ): Promise<Recipe[]> {
+        console.log('getAllRecipes');
+        return this.recipesService.getAllRecipes(filterDto);
     }
 
     @Get('/:id')
@@ -38,7 +47,8 @@ export class RecipesController {
     createRecipe(
         @Body() createRecipeDto: CreateRecipeDto,
         @GetUser() user: User): Promise<Recipe> {
-        this.logger.verbose(`User ${user.username} creating a new task. Data: ${JSON.stringify(createRecipeDto)}`);
+        this.logger.verbose(`User ${user.username} creating a new recipe.
+                            Data: ${JSON.stringify(createRecipeDto)}`);
         return this.recipesService.createRecipe(createRecipeDto, user);
     }
 
@@ -58,4 +68,5 @@ export class RecipesController {
     ): Promise<Recipe> {
         return this.recipesService.updateRecipeStatus(id, status, user);
     }
+
 }
