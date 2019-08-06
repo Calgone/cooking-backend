@@ -22,4 +22,8 @@ export class Recipe extends BaseEntity {
     @Column()
     userId: number;
 
+    @Column('boolean')
+    public: boolean;
+
+
 }

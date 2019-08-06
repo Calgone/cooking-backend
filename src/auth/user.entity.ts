@@ -1,6 +1,7 @@
 import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Recipe } from '../recipes/recipe.entity';
+import { UserTitle } from './user-title-enum';
 
 @Entity()
 @Unique(['username'])
@@ -10,6 +11,15 @@ export class User extends BaseEntity {
 
     @Column()
     username: string;
+
+    @Column()
+    firstname: string;
+
+    @Column()
+    lastname: string;
+
+    @Column()
+    title: UserTitle;
 
     @Column()
     password: string;
